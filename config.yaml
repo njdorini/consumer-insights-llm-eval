@@ -1,0 +1,35 @@
+# ---------------------------------------------------------------
+# Eval configuration. Edit this file to change which models run.
+# ---------------------------------------------------------------
+
+# The models being evaluated.
+#   name     = the label used in CSVs and charts
+#   provider = "anthropic" or "openai"
+#   model_id = the exact API model string
+#   effort   = optional reasoning effort ("low" | "medium" | "high").
+#              Set explicitly so every model gets a comparable thinking budget
+#              instead of each provider's own default.
+models:
+  - name: claude-opus-5-5
+    provider: anthropic
+    model_id: claude-opus-5-5
+    effort: high
+
+  - name: claude-sonnet-5-5
+    provider: anthropic
+    model_id: claude-sonnet-5-5
+    effort: high
+
+  - name: gpt-6.1-sol          # CONFIRM: pick the OpenAI model you want to compare
+    provider: openai
+    model_id: gpt-6.1-sol
+    effort: high
+
+# The LLM judge. It never sees which model wrote a response.
+judge:
+  provider: anthropic
+  model_id: claude-opus-5-5
+  effort: high
+
+# Max length of each model answer (tokens; ~0.75 words per token).
+max_output_tokens: 16000

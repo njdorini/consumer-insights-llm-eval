@@ -1,0 +1,4 @@
+model,criteria_judged,judge_pass_rate,criteria_human_graded,human_pass_rate,avg_output_tokens,avg_latency_s
+claude-opus-5-5,151,0.967,151,0.96,1800.366,20.639
+claude-sonnet-5-5,151,0.967,151,0.921,1453.39,13.3
+gpt-6.1-sol,151,0.834,151,0.755,755.317,20.863

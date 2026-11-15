@@ -1,0 +1,8 @@
+anthropic        # Claude API
+openai           # OpenAI API
+python-dotenv    # loads API keys from .env
+pyyaml           # reads prompts.yaml and config.yaml
+pandas           # tables / CSVs
+streamlit        # the grading web app
+scikit-learn     # Cohen's kappa
+matplotlib       # charts

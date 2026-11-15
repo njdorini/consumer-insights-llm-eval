@@ -1,0 +1,609 @@
+# Consumer Insights & Brand Strategy Eval: 41 tasks
+#
+# Fields:
+#   id, category, prompt, rubric  -> used by run_models.py / judge.py
+#   expert_note                   -> what the task tests; for graders only,
+#                                    never sent to the models or the judge.
+#
+# All companies, brands and numbers in these tasks are invented.
+# Next revision: drop or harden the tasks every model aced, then cut to ~25.
+
+
+
+  # ---------------------------------------------------------------- SURVEY DESIGN
+  - id: SD01
+    category: survey_design
+    prompt: |
+      A client drafted these questions for a customer survey for their coffee chain.
+      Review them and tell me what you'd change before fielding.
+
+      Q1. How satisfied are you with the speed and friendliness of our baristas? (1-5)
+      Q2. Given rising ingredient costs, would you be willing to pay a little more to
+          support higher-quality coffee? (Yes / No)
+      Q3. How often do you visit BrewHouse? (Always / Often / Sometimes / Never)
+      Q4. Don't you agree that BrewHouse has the best seasonal drinks in town? (Yes / No)
+    rubric:
+      - "Flags Q1 as double-barreled (speed and friendliness are separate constructs) and suggests splitting it"
+      - "Flags Q2 as leading/justifying (the cost preamble pushes toward Yes) and notes stated willingness-to-pay overstates real behavior"
+      - "Flags Q3's scale as vague: no time frame and non-quantified categories; suggests concrete frequency bands (e.g., visits in past 4 weeks)"
+      - "Flags Q4 as a leading question and binary format, and suggests a neutral rating or comparative question"
+    expert_note: "Classic questionnaire hygiene; the WTP overclaim point is the expert catch."
+
+  - id: SD02
+    category: survey_design
+    prompt: |
+      Here's the flow of a brand awareness survey for a sparkling water client.
+      Is anything wrong with it?
+
+      1. Screener: "Have you bought sparkling water in the past 3 months?"
+      2. "Which of these brands have you heard of? Select all." (list of 12 brands)
+      3. "When you think of sparkling water, which brands come to mind first?" (open text)
+      4. "Which of these brands would you consider buying next time?" (list)
+    rubric:
+      - "Identifies that unaided awareness (Q3) must be asked before the aided list (Q2)"
+      - "Explains that showing the list first contaminates and inflates unaided/top-of-mind results"
+      - "Recommends the correct order: unaided, then aided, then consideration"
+    expert_note: "Order effects. Easy for experts, models sometimes miss it amid generic feedback."
+
+  - id: SD03
+    category: survey_design
+    prompt: |
+      A subscription meal-kit client wants to understand why customers cancel. Their plan
+      is to email a survey to their current active subscribers asking "What would make you
+      consider cancelling?" and use the answers to build a churn-reduction roadmap.
+      What's your assessment of this plan?
+    rubric:
+      - "Identifies the selection/survivorship problem: active subscribers are not the people who churned"
+      - "Recommends surveying or interviewing recently cancelled customers (e.g., via CRM list)"
+      - "Notes that hypothetical 'what would make you cancel' questions are weaker than asking churners about actual reasons, and/or that recall fades so timing matters"
+      - "Suggests pairing survey data with behavioral data (usage before cancellation, tenure, skips)"
+    expert_note: "Selection bias in research design."
+
+  - id: SD04
+    category: survey_design
+    prompt: |
+      A client wants a 20-minute mobile survey that includes a grid of 25 brand attributes,
+      each rated on a 5-point agree/disagree scale, for each of 6 brands. They want every
+      respondent to rate every brand. Any concerns?
+    rubric:
+      - "Calculates or recognizes the burden (150 grid ratings) is excessive for mobile"
+      - "Flags data quality risks: straightlining, fatigue, acquiescence bias"
+      - "Recommends reducing burden: fewer attributes, rating only brands the respondent is aware of, or a pick-any brand-association format"
+      - "Suggests quality controls (attention checks, randomized attribute order) or a trade-off method (e.g., MaxDiff) for prioritization"
+    expert_note: "Practical fieldwork judgment."
+
+  - id: SD05
+    category: survey_design
+    prompt: |
+      We just closed fieldwork on an online panel survey (n=1,200). Quick data summary:
+      - Median length of interview: 14 minutes
+      - 18% of completes finished in under 5 minutes
+      - 9% gave identical answers across every grid
+      - About 60 open-ended responses to "Why did you choose this brand?" are just
+        "good product" or "very nice", many with identical wording and timestamps
+        within seconds of each other
+      The client wants topline results tomorrow. How should we proceed?
+    rubric:
+      - "Flags speeders (under ~1/3 of median LOI) as likely low-quality and recommends removal"
+      - "Flags straightliners and identical clustered open-ends as likely bots or fraud"
+      - "Recommends a documented cleaning rule and checking how removals affect the toplines and quotas"
+      - "Recommends replacing removed sample or flagging reduced base, rather than shipping uncleaned data to hit the deadline"
+    expert_note: "Data quality; very Surge-relevant."
+
+  # ---------------------------------------------------------------- RESEARCH DESIGN & STATS
+  - id: RD01
+    category: research_design
+    prompt: |
+      A snack client wants to test 6 new flavor concepts. Budget allows n=600 total.
+      They want a monadic design (each respondent sees one concept) and want to be able
+      to tell apart concepts that differ by 5 points on top-2-box purchase intent
+      (scores are expected around 40-50%). Will this design work?
+    rubric:
+      - "Computes ~100 respondents per cell and a margin of error around ±10 points at 95% confidence"
+      - "Concludes 5-point differences cannot be reliably detected at this sample size"
+      - "Offers viable alternatives: fewer concepts, larger sample, or sequential monadic with rotation"
+      - "If recommending sequential monadic, notes order/position effects and the need to rotate"
+    expert_note: "Power and sample size math."
+
+  - id: RD02
+    category: stats
+    prompt: |
+      Total sample is n=1,000 adults, nationally representative. The client wants a
+      results table broken out by 6 regions x 3 age groups (18 cells) and wants to call
+      out the 'best' and 'worst' cells in the exec summary. Thoughts?
+    rubric:
+      - "Calculates roughly 55 respondents per cell on average (fewer in some)"
+      - "Notes margin of error per cell is roughly ±13 points or more, so cell differences are mostly noise"
+      - "Warns that picking best/worst out of 18 cells invites false positives (multiple comparisons)"
+      - "Recommends reporting regions and age groups separately, flagging low bases, or boosting sample"
+    expert_note: "Small bases + multiple comparisons."
+
+  - id: RD03
+    category: stats
+    prompt: |
+      Our online sample came back 70% female versus a 50/50 target. The vendor weighted
+      it to 50/50. Some male respondents in an underfilled age band now carry a weight of 6.
+      The client says "it's weighted, so we're fine." Are we?
+    rubric:
+      - "Explains that large weights inflate variance and reduce effective sample size"
+      - "Notes that a few heavily weighted respondents can swing results"
+      - "Recommends weight trimming/capping and reporting effective sample size"
+      - "Recommends fixing the root cause with quotas in future waves"
+    expert_note: "Weighting is not free."
+
+  - id: RD04
+    category: research_design
+    prompt: |
+      An e-commerce client ran an A/B test on a new product page. The analyst checked
+      results every day and stopped the test on day 6 when the new page hit p = 0.04
+      on conversion. The client wants to roll it out. Your view?
+    rubric:
+      - "Identifies 'peeking'/optional stopping as inflating the false-positive rate"
+      - "States that p = 0.04 under daily peeking is not trustworthy evidence"
+      - "Recommends a pre-set sample size/duration or a proper sequential testing method"
+      - "Notes 6 days may not cover a full weekly cycle"
+    expert_note: "Experiment hygiene."
+
+  - id: RD05
+    category: research_design
+    prompt: |
+      A brand ran a digital campaign and measured brand lift by comparing people who saw
+      the ads with people who didn't. Purchase intent was 34% among exposed vs 21% among
+      unexposed. The campaign was targeted at past site visitors and lookalike audiences.
+      How much lift should we report?
+    rubric:
+      - "Identifies selection bias: targeting means the exposed group was already warmer/more likely to buy"
+      - "States the 13-point gap cannot be attributed to the ads"
+      - "Recommends a randomized holdout or ghost-ad/PSA control design"
+      - "Notes matched or weighted controls help but don't fully fix the bias"
+    expert_note: "Causal attribution."
+
+  - id: RD06
+    category: research_design
+    prompt: |
+      We ran the same customer satisfaction survey in Japan, Brazil, and the US.
+      Average satisfaction (0-10): Brazil 8.6, US 7.9, Japan 6.4. The regional VP wants
+      to put the Japan team on a performance plan. What do you advise?
+    rubric:
+      - "Raises cultural response styles (e.g., Japanese respondents tend toward the midpoint, Brazilian toward the positive extreme)"
+      - "Says raw cross-country score comparisons are unreliable"
+      - "Recommends within-country comparisons (vs local competitors or own trend) or standardized/relative scores"
+      - "Advises against a performance action based on this data alone"
+    expert_note: "Cross-cultural measurement."
+
+  - id: RD07
+    category: research_design
+    prompt: |
+      A client making a mobility aid for older adults wants a quick online panel survey
+      of people aged 75+ to size demand. What should we watch out for?
+    rubric:
+      - "Flags coverage bias: online panelists 75+ are more tech-savvy, healthier, and more mobile than the population"
+      - "Notes the people who most need the product may be underrepresented"
+      - "Suggests mixed mode (phone, mail, intercepts) or reaching caregivers/adult children as purchasers/influencers"
+    expert_note: "Sample frame mismatch."
+
+  # ---------------------------------------------------------------- BRAND TRACKING
+  - id: BT01
+    category: brand_tracking
+    prompt: |
+      Quarterly brand tracker, n=400 per wave. Aided awareness went from 62% in Q1 to
+      66% in Q2. The new TV campaign launched at the start of Q2. The CMO wants a slide
+      saying "Campaign drove a 4-point lift in awareness." Can we say that?
+    rubric:
+      - "Recognizes a 4-point change at n=400 per wave is not statistically significant (difference MoE ~±6-7 points)"
+      - "Says the change can't be attributed to the campaign on this evidence"
+      - "Suggests corroborating evidence: ad recall, trend over more waves, exposed vs unexposed, regional variation in media weight"
+      - "Proposes honest wording for the slide (e.g., directional, not significant)"
+    expert_note: "Significance + causal overclaim."
+
+  - id: BT02
+    category: brand_tracking
+    prompt: |
+      Tracker results for a challenger oat milk brand after a big awareness campaign:
+
+      | Metric                 | Before | After |
+      |------------------------|--------|-------|
+      | Aided awareness        | 48%    | 61%   |
+      | Consideration (total)  | 22%    | 21%   |
+
+      The client is alarmed: "Awareness went way up but consideration went down. Is the
+      campaign hurting the brand?" What's going on?
+    rubric:
+      - "Computes consideration among aware dropped (about 46% to about 34%) while total consideration is essentially flat"
+      - "Explains that newly aware people are often lighter category buyers or poorer fit, which dilutes the conversion ratio"
+      - "Concludes this is not evidence the campaign damaged the brand, and the 1-point drop is likely noise"
+      - "Recommends checking consideration among previously aware vs newly aware, or among category buyers specifically"
+    expert_note: "Funnel ratio dilution. Models often over-diagnose 'brand damage.'"
+
+  - id: BT03
+    category: brand_tracking
+    prompt: |
+      Our brand tracker switched panel suppliers in Q3. In Q3, every brand in the
+      category, including ours, dropped 5-9 points on awareness and image scores. The
+      client asks why the market got so much weaker. How do you respond?
+    rubric:
+      - "Identifies the supplier switch as a likely methodological break, not a market change"
+      - "Notes that all brands moving together is a sign of a measurement effect"
+      - "Recommends a parallel run/calibration study or re-baselining, and footnoting the break in trend charts"
+    expert_note: "Panel effects."
+
+  - id: BT04
+    category: brand_tracking
+    prompt: |
+      In the Pacific Northwest region, our retail brand's NPS went from +20 last quarter
+      to -5 this quarter. The regional base is 38 respondents. The regional manager wants
+      to launch a service recovery program. Advice?
+    rubric:
+      - "Flags the base of 38 as far too small for a reliable NPS reading"
+      - "Explains that NPS has high variance; a few respondents shifting categories can swing it 25 points"
+      - "Recommends pooling quarters, boosting sample, or checking other data (complaints, reviews, sales) before acting"
+    expert_note: "Small-base NPS."
+
+  - id: BT05
+    category: brand_perception
+    prompt: |
+      Brand image results for a yogurt category. The market leader scores highest on
+      every single attribute: "premium", "good value", "healthy", "fun", "for people
+      like me". The #4 brand's marketing team concludes they have no strengths. Are they right?
+    rubric:
+      - "Identifies the brand size/halo effect: bigger brands get more associations on every attribute because more people know and use them"
+      - "Recommends adjusting for brand size (e.g., expected vs actual scores, residuals, correspondence analysis)"
+      - "Notes the #4 brand may over-index on specific attributes relative to its size, which are its real differentiators"
+    expert_note: "Brand image halo; core brand-research expertise."
+
+  - id: BT06
+    category: brand_tracking
+    prompt: |
+      Our client's brand is strong on being seen as meaningful (meets needs, liked) and
+      different (stands out) in tracker data, but it scores low on salience (comes to mind
+      quickly in buying situations). Market share is flat. The CMO wants to fund a
+      repositioning project. What would you recommend?
+    rubric:
+      - "Diagnoses the problem as salience/mental availability, not positioning"
+      - "Warns that repositioning risks giving up existing meaningful/different strengths"
+      - "Recommends building salience: more reach, consistent distinctive brand assets, linking the brand to buying occasions/cues"
+    expert_note: "Meaningful/Different/Salient-style diagnosis."
+
+  # ---------------------------------------------------------------- SEGMENTATION
+  - id: SG01
+    category: segmentation
+    prompt: |
+      A challenger pet food brand (overall share 8%) has this segmentation. Which segment
+      should it prioritize for growth, and why?
+
+      | Segment            | % of buyers | % of category spend | Brand share in segment | Key trait                                      |
+      |--------------------|-------------|---------------------|------------------------|------------------------------------------------|
+      | Devoted Enthusiasts| 8%          | 12%                 | 31%                    | Love premium, ingredient-led; love our brand   |
+      | Value Seekers      | 30%         | 22%                 | 6%                     | Buy on price/promo                             |
+      | Busy Pragmatists   | 27%         | 34%                 | 9%                     | Convenience-driven, weak brand attachment      |
+      | Leader Loyalists   | 20%         | 25%                 | 3%                     | Strongly attached to the market leader         |
+      | Light/Lapsed       | 15%         | 7%                  | 10%                    | Infrequent buyers                              |
+    rubric:
+      - "Prioritizes Busy Pragmatists (or gives a strong spend-based argument) because of largest spend, low share, and weak attachment"
+      - "Explains Devoted Enthusiasts are already highly penetrated with small spend, so limited headroom despite attitudinal fit"
+      - "Notes Value Seekers would likely require margin-eroding price/promo competition"
+      - "Notes Leader Loyalists are expensive and slow to convert"
+      - "Quantifies headroom in some way (e.g., segment spend x share not yet won)"
+    expert_note: "Trap: the attitudinally aligned segment is the obvious but wrong answer."
+
+  - id: SG02
+    category: segmentation
+    prompt: |
+      Last year we built an attitudinal segmentation for a bank (based on financial
+      attitudes like "I like to be in control" or "I want expert guidance"). Leadership
+      loved it. Six months later, the sales and CRM teams say they can't use it because
+      they can't tell which segment a given customer belongs to. What went wrong and how
+      do we fix it?
+    rubric:
+      - "Identifies an actionability gap: segments defined on attitudes that aren't in the customer database"
+      - "Recommends a typing tool/algorithm (a short set of 'golden questions') to classify customers"
+      - "Suggests linking segments to data the bank has (behavioral, product holdings, demographics) or a hybrid segmentation"
+      - "Notes accuracy trade-offs of predicting attitudinal segments from database variables"
+    expert_note: "Segmentation adoption, a real-life failure mode."
+
+  - id: SG03
+    category: segmentation
+    prompt: |
+      Our cluster analysis (n=1,500) produced a 7-segment solution. One segment, "Eco
+      Trendsetters," is 3% of the sample. The client loves this segment and wants to
+      build a sub-brand for it. What should we tell them?
+    rubric:
+      - "Flags the base as small (~45 respondents) and the segment as potentially unstable"
+      - "Recommends checking reproducibility (different seeds, split-half, alternative solutions)"
+      - "Raises commercial sizing: 3% of the market may not support a sub-brand"
+      - "Suggests a validation step (boost sample or follow-up research) before investment"
+    expert_note: "Cluster stability + business sizing."
+
+  - id: SG04
+    category: segmentation
+    prompt: |
+      In our survey, 92% of respondents rated "quality" as 9 or 10 out of 10 in importance,
+      and 88% rated "price" the same way. The client wants to know which to emphasize.
+    rubric:
+      - "Identifies that stated importance ratings don't discriminate (everything is important)"
+      - "Recommends derived importance (relating attributes to preference/choice) or a trade-off method like MaxDiff or conjoint"
+      - "Notes that 'table stakes' attributes can be important but not differentiating"
+    expert_note: "Stated vs derived importance."
+
+  # ---------------------------------------------------------------- DATA INTERPRETATION
+  - id: DI01
+    category: data_interpretation
+    prompt: |
+      A beverage client tested new packaging in stores across two regions.
+
+      | Region | Pack | Shoppers exposed | Purchases |
+      |--------|------|------------------|-----------|
+      | A      | Old  | 800              | 200       |
+      | A      | New  | 200              | 54        |
+      | B      | Old  | 200              | 20        |
+      | B      | New  | 800              | 96        |
+
+      Overall, old pack converts 22% and new pack 15%, so the client wants to kill the
+      new pack. Do you agree?
+    rubric:
+      - "Computes within-region conversion: A old 25% vs new 27%; B old 10% vs new 12%"
+      - "Identifies Simpson's paradox/confounding: new pack was mostly placed in the low-converting region"
+      - "Concludes the new pack performed better in both regions"
+      - "Recommends a balanced/randomized test design to confirm"
+    expert_note: "Simpson's paradox."
+
+  - id: DI02
+    category: data_interpretation
+    prompt: |
+      A retailer's analytics team found that customers who use the mobile app have 2x
+      the 12-month retention of those who don't. They propose spending $3M on app-download
+      incentives to double retention across the base. Evaluate the proposal.
+    rubric:
+      - "Identifies self-selection: loyal customers are more likely to download the app (correlation, not causation)"
+      - "Says the 2x figure will not carry over to customers induced by incentives"
+      - "Recommends an experiment (randomized incentive offer) to measure the causal effect before scaling"
+    expert_note: "Correlation vs causation."
+
+  - id: DI03
+    category: data_interpretation
+    prompt: |
+      A new frozen meal concept scored 68% top-2-box purchase intent ("definitely" +
+      "probably would buy") in a concept test. The client's finance team built a forecast
+      assuming 68% of their target market will buy it in year one. What's wrong?
+    rubric:
+      - "States that stated purchase intent overstates actual behavior"
+      - "Explains calibration: discount 'definitely' and especially 'probably' responses using category norms"
+      - "Notes that awareness and distribution/availability limits must also be factored in"
+      - "Recommends a proper volumetric forecasting approach or benchmarks"
+    expert_note: "Purchase intent calibration."
+
+  - id: DI04
+    category: data_interpretation
+    prompt: |
+      A restaurant chain identified its 20 lowest-scoring locations on guest satisfaction
+      in Q1 and sent them a coaching program. In Q2, those 20 locations improved by an
+      average of 9 points while the rest of the chain improved by 1 point. Leadership wants
+      to roll out the coaching program everywhere. Is the evidence solid?
+    rubric:
+      - "Identifies regression to the mean: extreme low scorers tend to improve on re-measurement regardless"
+      - "Says the 9-point gain overstates the program's effect"
+      - "Recommends a control group of similarly low-scoring locations that didn't get coaching (ideally randomized)"
+    expert_note: "Regression to the mean."
+
+  - id: DI05
+    category: data_interpretation
+    prompt: |
+      A spirits brand ran a campaign in December. Sales were up 15% versus November.
+      The agency's recap credits the campaign with a 15% sales lift. How would you assess it?
+    rubric:
+      - "Flags seasonality: December is a peak month for spirits"
+      - "Recommends year-over-year or seasonally adjusted comparison, and comparison with category/competitor trends"
+      - "Mentions other drivers to rule out (price promotions, distribution gains)"
+      - "Suggests better attribution methods (control markets, marketing mix modeling)"
+    expert_note: "Seasonality and confounds."
+
+  - id: DI06
+    category: data_interpretation
+    prompt: |
+      Social listening shows 80% positive sentiment about our skincare brand's new
+      product, based on 240 mentions in the past month. The brand team wants to report
+      to the board that "consumers love the launch." Is that fair?
+    rubric:
+      - "Notes 240 mentions is a tiny and self-selected group, not representative of buyers"
+      - "Raises sentiment classifier accuracy issues (sarcasm, influencer/sponsored posts)"
+      - "Recommends triangulating with representative data (survey, reviews, repeat purchase)"
+    expert_note: "Representativeness."
+
+  - id: DI07
+    category: data_interpretation
+    prompt: |
+      A cereal brand raised prices 10%. In the following 8 weeks, volume fell 4%. The
+      CFO concludes demand is inelastic and wants another 10% increase next quarter.
+      What would you caution?
+    rubric:
+      - "Notes short-term response can understate longer-term elasticity (habit, stock-up, delayed switching)"
+      - "Asks whether competitors also raised prices, which would mute switching"
+      - "Mentions checking other factors like promotions, distribution changes, and private label share"
+      - "Warns elasticity is not constant: a second increase may cross price thresholds"
+    expert_note: "Pricing judgment."
+
+  - id: DI08
+    category: data_interpretation
+    prompt: |
+      A soda brand launched a new flavor that sold 1 million units in its first year.
+      The brand team's slide says "1M incremental units." What question would you ask,
+      and how would you answer it?
+    rubric:
+      - "Raises cannibalization: some flavor sales came from the brand's existing SKUs"
+      - "Recommends source-of-volume analysis (household panel data on switching)"
+      - "Distinguishes total sales from incremental sales to the brand"
+    expert_note: "Cannibalization."
+
+  # ---------------------------------------------------------------- GROWTH STRATEGY
+  - id: GS01
+    category: growth_strategy
+    prompt: |
+      Two laundry detergent brands:
+
+      | Brand  | Penetration (% households buying/yr) | Avg purchases per buyer/yr |
+      |--------|---------------------------------------|----------------------------|
+      | Leader | 42%                                   | 3.6                        |
+      | Ours   | 9%                                    | 2.7                        |
+
+      Our brand team believes we have a "loyalty problem" because our buyers purchase less
+      often, and wants to launch a loyalty program. What do you think?
+    rubric:
+      - "Recognizes double jeopardy: smaller brands have far fewer buyers and those buyers buy slightly less often"
+      - "Concludes our purchase frequency is roughly normal for our size, not a distinct loyalty problem"
+      - "Recommends growth through penetration (reaching more buyers, mental and physical availability)"
+      - "Is skeptical a loyalty program will materially change frequency"
+    expert_note: "Ehrenberg-Bass / double jeopardy."
+
+  - id: GS02
+    category: growth_strategy
+    prompt: |
+      A sparkling wine brand's heavy buyers are 20% of its buyers and 50% of its volume,
+      and they already buy our brand on about 80% of their category purchases. The brand
+      wants to focus all marketing on heavy buyers to drive growth. Assess this.
+    rubric:
+      - "Notes heavy buyers have limited headroom (already ~80% share of their purchases)"
+      - "Explains most growth potential sits with light and non-buyers"
+      - "Recommends broad reach to grow penetration, while maintaining heavy buyers"
+    expert_note: "Headroom math."
+
+  - id: GS03
+    category: growth_strategy
+    prompt: |
+      A mainstream snack brand's buyers are spread fairly evenly across ages 18-65.
+      The new CMO wants to put 100% of media budget on millennials because "they're the
+      future." What's your view?
+    rubric:
+      - "Notes that narrow targeting caps reach and penetration when buyers span all ages"
+      - "Warns this risks losing current buyers outside the target"
+      - "Recommends broad reach media, possibly with tailored creative for millennials, rather than exclusive targeting"
+    expert_note: "Targeting vs reach."
+
+  - id: GS04
+    category: growth_strategy
+    prompt: |
+      A shampoo brand's tracker summary:
+      - Prompted awareness: 85% (competitor: 88%)
+      - Consideration among aware: 41% (competitor: 43%)
+      - Conversion at shelf (bought among those who considered): 18% (competitor: 39%)
+      - Weighted distribution: 60% (competitor: 92%)
+      The CEO asks: "What's our brand's biggest problem?"
+    rubric:
+      - "Identifies physical availability/distribution as the main issue (60% vs 92%)"
+      - "Connects low shelf conversion to not being on shelf, rather than brand perception"
+      - "Notes awareness and consideration are roughly at parity with the competitor"
+      - "Recommends a distribution-focused plan (retailer listings, shelf presence) before brand-building spend"
+    expert_note: "Physical vs mental availability."
+
+  # ---------------------------------------------------------------- JOURNEY MAPPING & QUAL
+  - id: JM01
+    category: journey_mapping
+    prompt: |
+      An online mattress brand asked us to help fix "checkout friction." Their funnel
+      shows a big drop between product page and checkout. Excerpts from 8 customer interviews:
+
+      - "I loved the mattress but kept thinking: what if it's wrong and I have to send back
+        a giant box?"
+      - "Checkout was fine, honestly."
+      - "I read the return policy three times. It sounded like a hassle."
+      - "I almost bought, then went to a store to lie on one first."
+      - "The 100-night trial sounded good but I didn't know who picks it up."
+      - "Payment page was quick."
+      - "My friend had a nightmare return with another brand."
+      - "I wanted to know what happens to the returned mattress."
+
+      What's the real problem and what would you recommend?
+    rubric:
+      - "Identifies return anxiety (uncertainty about the return process) as the main barrier, not checkout UX"
+      - "Notes the cross-stage link: a post-purchase concern drives pre-purchase drop-off"
+      - "Uses the evidence: most participants mention returns, few mention checkout problems"
+      - "Recommends making the return process concrete and easy (who picks up, how, where it goes) on product pages"
+    expert_note: "Reframing the client's question."
+
+  - id: JM02
+    category: journey_mapping
+    prompt: |
+      A telecom client built a customer journey map in a two-day internal workshop with
+      marketing, product, and customer service leaders. No customer research was involved.
+      They want us to "build the strategy off of it." What would you say?
+    rubric:
+      - "Flags an inside-out bias: the map reflects internal assumptions, not customer experience"
+      - "Recommends validating with customer research (qual interviews, then quant to size pain points)"
+      - "Suggests using the internal map as hypotheses rather than discarding it"
+      - "Mentions identifying and prioritizing 'moments that matter' by customer impact"
+    expert_note: "Outside-in validation."
+
+  - id: JM03
+    category: journey_mapping
+    prompt: |
+      E-commerce funnel for a home goods site, with industry benchmarks:
+
+      | Step                     | Our conversion | Benchmark |
+      |--------------------------|----------------|-----------|
+      | Visit -> product page    | 38%            | 40%       |
+      | Product page -> cart     | 9%             | 10%       |
+      | Cart -> checkout start   | 31%            | 55%       |
+      | Checkout -> purchase     | 62%            | 65%       |
+
+      The team wants to focus on Visit -> product page because "that's where we lose the
+      most people." Where should they focus?
+    rubric:
+      - "Recognizes the largest absolute drop-off isn't the right prioritization criterion on its own"
+      - "Identifies Cart -> checkout start as the biggest gap versus benchmark (31% vs 55%)"
+      - "Estimates or reasons about the purchase impact of closing each gap"
+      - "Recommends diagnosing the cart step (shipping costs revealed, forced account creation, etc.)"
+    expert_note: "Benchmark-relative prioritization."
+
+  - id: QS01
+    category: qual_synthesis
+    prompt: |
+      We ran 12 user interviews on a redesigned banking app. One participant spent 20
+      minutes describing in detail how much they hate the new design, with very vivid
+      quotes. Of the other 11, 7 were positive and 4 were mixed. The client's product lead
+      wants the readout headline to be "Customers hate the new app." How do you respond?
+    rubric:
+      - "Pushes back: one vivid participant shouldn't drive the headline"
+      - "Summarizes the actual pattern across participants (mostly positive or mixed)"
+      - "Notes qual research can't establish prevalence; recommends quant if they need to size sentiment"
+      - "Suggests examining the critic's specific issues as possible usability insights"
+    expert_note: "Synthesis discipline."
+
+  - id: QS02
+    category: qual_synthesis
+    prompt: |
+      In focus groups, almost every participant said they would never buy store-brand
+      pasta sauce because "the quality isn't there." Household panel data shows 45% of
+      these same types of shoppers bought store-brand sauce in the past year. Which do you
+      trust and why?
+    rubric:
+      - "Identifies the say-do gap and favors actual purchase data for behavior"
+      - "Explains social desirability and group dynamics in focus groups"
+      - "Still finds value in qual: understanding perceptions, why people buy despite stated views"
+    expert_note: "Say vs do."
+
+  # ---------------------------------------------------------------- CLIENT COMMUNICATION
+  - id: CC01
+    category: client_communication
+    prompt: |
+      Write a short executive summary (under 150 words) for a CMO about her spring
+      campaign. The data: ad recall was 31% among people in high-media regions vs 24% in
+      low-media regions; brand consideration was flat at 19% in both; sales grew 3% vs
+      category growth of 3%. She has told the team she expects to hear the campaign worked.
+    rubric:
+      - "Accurately reports that the campaign was noticed (higher recall where media was heavier)"
+      - "Honestly states there's no evidence yet of impact on consideration or sales relative to category"
+      - "Does not overclaim success to please the stakeholder"
+      - "Ends with a constructive next step or hypothesis (e.g., creative/message diagnostics, longer-term read)"
+      - "Stays under 150 words and is executive-ready in tone"
+    expert_note: "Honesty under pressure. Models often spin positive."
+
+  - id: CC02
+    category: client_communication
+    prompt: |
+      A client asks: "Our tracker shows our 'trust' score dropped from 54% to 51%
+      this quarter, n=500 per wave. Should we be worried and what should we tell our CEO?"
+      Answer as you would in an email to the client.
+    rubric:
+      - "Recognizes a 3-point drop at n=500 per wave is within normal noise (not significant)"
+      - "Recommends watching the trend across waves and checking for related signals rather than reacting"
+      - "Gives the client clear, calm language they can use with their CEO"
+    expert_note: "Calm, accurate stakeholder framing."
