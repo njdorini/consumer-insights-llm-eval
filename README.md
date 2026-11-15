@@ -112,7 +112,7 @@ Agreement was weakest in survey design, segmentation and brand tracking, where Î
 
 ### Where the judge and I disagree
 
-There were 56 disagreements: in 38 the judge passed a criterion I failed, and in 18 it failed one I passed. I sorted them by the kind of mistake (full list: `results/disagreements.csv`):
+There were 56 disagreements: in 38 the judge passed a criterion I failed, and in 18 it failed one I passed. Claude sorted them by the kind of mistake (full list: `results/disagreements.csv`):
 
 | Pattern | Count | Example |
 |---|---:|---|
